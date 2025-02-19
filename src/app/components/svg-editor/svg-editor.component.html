@@ -1,0 +1,33 @@
+<mat-card class="container">
+  <mat-card-content>
+    <mat-card-header class="flex-around">
+      <div class="custom-btn">
+        <input type="file" (change)="uploadSVG($event)" accept="image/svg+xml" hidden #fileInput>
+        <button mat-raised-button color="primary" (click)="fileInput.click()">Upload SVG</button>
+      </div>
+      <div class="custom-btn" *ngIf="uploadedSVG">
+        <button mat-raised-button color="accent" (click)="changeColor()" [disabled]="!selectedElement">
+          <mat-icon>color_lens</mat-icon>
+          Change Selected Element Color
+        </button>
+        <button mat-raised-button color="primary" (click)="showAttributesDialog()" [disabled]="!selectedElement">
+          <mat-icon>edit</mat-icon>
+          Edit Attributes
+        </button>
+        <button mat-raised-button color="warn" (click)="togglePreview()">
+          <mat-icon>visibility</mat-icon>
+          {{ previewMode ? 'Exit Preview' : 'Preview' }}
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div #svgContainer class="svg-container" (contextmenu)="onRightClick($event)" [class.preview-mode]="previewMode">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="svg">
+          <g></g>
+        </svg>
+      </div>
+    </mat-card-content>
+
+  </mat-card-content>
+</mat-card>

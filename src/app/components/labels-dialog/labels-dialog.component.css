@@ -1,0 +1,11 @@
+.custom-form {
+  display: grid;
+  margin-top: 2rem;
+}
+
+.image-container {
+  border-radius: 1rem;
+  margin-top: 2rem;
+  width: 90%;
+  height: 90%;
+}

@@ -1,10 +1,10 @@
 // app-routing.module.ts
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {AppComponent} from './app.component';
+import {SvgEditorComponent} from './components/svg-editor/svg-editor.component';
 
 const routes: Routes = [
-  {path: '', component: AppComponent}
+  {path: '', component: SvgEditorComponent},
 ];
 
 @NgModule({

@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>{{ data.existingLabel ? 'Edit Label' : 'Add Label' }}</h2>
+
+<mat-dialog-content>
+  <mat-button-toggle-group [(ngModel)]="labelType" aria-label="Label Type">
+    <mat-button-toggle value="text">Text</mat-button-toggle>
+    <mat-button-toggle value="image">Image</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <div *ngIf="labelType === 'text'" class="custom-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Text</mat-label>
+      <input matInput [(ngModel)]="labelText"/>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Color</mat-label>
+      <input matInput type="color" [(ngModel)]="labelColor"/>
+    </mat-form-field>
+
+    <div [ngStyle]="{'color': labelColor}">
+      {{ labelText }}
+    </div>
+  </div>
+
+  <div *ngIf="labelType === 'image'" class="custom-form">
+    <input type="file" (change)="onImageChange($event)"/>
+
+    <div *ngIf="imageUrl" class="flex-center">
+      <img [src]="imageUrl" alt="Selected Image" class=" image-container"/>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dialogRef.close()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()">Save</button>
+  <button mat-raised-button color="warn" (click)="onDelete()">Delete</button>
+</mat-dialog-actions>
