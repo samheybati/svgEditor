@@ -19,16 +19,28 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
   standalone: false
 })
 export class ColorPickerDialogComponent {
-  selectedColor: string;
+  selectedColor: string
 
   constructor(
     public dialogRef: MatDialogRef<ColorPickerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    this.selectedColor = data.color || '#ff0000';
+    this.selectedColor = this.rgbToHex(this.data.color);
   }
 
   saveColor(): void {
     this.dialogRef.close(this.selectedColor);
   }
+
+  rgbToHex(rgb: string): string {
+    const result = rgb.match(/\d+/g);
+    if (result) {
+      const r = parseInt(result[0]).toString(16).padStart(2, '0');
+      const g = parseInt(result[1]).toString(16).padStart(2, '0');
+      const b = parseInt(result[2]).toString(16).padStart(2, '0');
+      return `#${r}${g}${b}`;
+    }
+    return '#000000';
+  }
+
 }
