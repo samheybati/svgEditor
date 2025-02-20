@@ -22,7 +22,7 @@ export class SvgEditorComponent {
   }
 
 
-  uploadSVG(event: Event): void {
+  public uploadSVG(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const reader = new FileReader();
@@ -39,11 +39,15 @@ export class SvgEditorComponent {
         }
 
 
-        this.uploadedSVG.selectAll('*').on('click', (event: any) => {
+        this.uploadedSVG.on('click', (event: MouseEvent) => {
           event.stopPropagation();
-          this.selectedElement = d3.select(event.currentTarget);
-          this.extractAttributes();
-          this.highlightSelectedElement();
+          const target = d3.select(event.target as SVGElement);
+
+          if (!target.empty() && target.node() !== this.uploadedSVG.node()) {
+            this.selectedElement = target;
+            this.extractAttributes();
+            this.highlightSelectedElement();
+          }
         });
 
         const svgElement = this.svgContainer.nativeElement.querySelector('svg');
@@ -57,8 +61,7 @@ export class SvgEditorComponent {
     }
   }
 
-
-  extractAttributes(): void {
+  public extractAttributes(): void {
     if (this.selectedElement) {
       this.attributes = [];
       const elementNode = this.selectedElement.node();
@@ -68,7 +71,7 @@ export class SvgEditorComponent {
     }
   }
 
-  showAttributesDialog(): void {
+  public showAttributesDialog(): void {
     const dialogRef = this.dialog.open(AttributesDialogComponent, {
       width: '400px',
       data: {attributes: this.attributes},
@@ -83,37 +86,42 @@ export class SvgEditorComponent {
     });
   }
 
-  highlightSelectedElement(): void {
+  public highlightSelectedElement(): void {
     this.uploadedSVG.selectAll('*').style('stroke', 'none');
     if (this.selectedElement) {
-      this.selectedElement.style('stroke', 'blue').style('stroke-width', '2px');
+      this.selectedElement.style('stroke', 'blue').style('stroke-width', '10px');
     }
   }
 
-  changeColor(): void {
-    if (this.selectedElement) {
+  public changeColor(): void {
+    if (this.selectedElement && this.previewMode) {
       const previousColor = this.selectedElement.style('fill');
+
       const dialogRef = this.dialog.open(ColorPickerDialogComponent, {
         width: '400px',
         height: '400px',
         data: {color: previousColor}
       });
+
       dialogRef.afterClosed().subscribe((newColor) => {
         if (newColor) {
           this.selectedElement.style('fill', newColor);
-          setTimeout(() => {
-            this.selectedElement.style('fill', previousColor);
-          }, 5000);
+
+          if (this.previewMode) {
+            setTimeout(() => {
+              this.selectedElement.style('fill', previousColor);
+            }, 5000);
+          }
         }
       });
     }
   }
 
-  togglePreview(): void {
+  public togglePreview(): void {
     this.previewMode = !this.previewMode;
   }
 
-  onRightClick(event: MouseEvent): void {
+  public onRightClick(event: MouseEvent): void {
     event.preventDefault();
 
     const [x, y] = d3.pointer(event, this.uploadedSVG.node());

@@ -10,7 +10,8 @@
           <mat-icon>color_lens</mat-icon>
           Change Selected Element Color
         </button>
-        <button mat-raised-button color="primary" (click)="showAttributesDialog()" [disabled]="!selectedElement">
+        <button mat-raised-button color="primary" (click)="showAttributesDialog()"
+                [disabled]="!selectedElement || previewMode">
           <mat-icon>edit</mat-icon>
           Edit Attributes
         </button>

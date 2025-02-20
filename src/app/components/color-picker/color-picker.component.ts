@@ -6,7 +6,7 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
   template: `
     <h2 mat-dialog-title>Change Color</h2>
     <mat-dialog-content>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="mat-mdc-dialog-content">
         <mat-label>Select Color</mat-label>
         <input matInput type="color" [(ngModel)]="selectedColor"/>
       </mat-form-field>
