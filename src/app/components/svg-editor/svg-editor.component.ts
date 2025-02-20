@@ -17,6 +17,7 @@ export class SvgEditorComponent {
   selectedElement: any = null;
   attributes: { name: string; value: string }[] = [];
   previewMode: boolean = false;
+  timeoutsMap: Map<any, any> = new Map()
 
   constructor(public dialog: MatDialog) {
   }
@@ -94,23 +95,33 @@ export class SvgEditorComponent {
   }
 
   public changeColor(): void {
-    if (this.selectedElement && this.previewMode) {
+    if (this.selectedElement) {
       const previousColor = this.selectedElement.style('fill');
-
       const dialogRef = this.dialog.open(ColorPickerDialogComponent, {
         width: '400px',
         height: '400px',
-        data: {color: previousColor, previewMode: this.previewMode}
+        data: {color: previousColor}
       });
-
       dialogRef.afterClosed().subscribe((newColor) => {
         if (newColor) {
           this.selectedElement.style('fill', newColor);
-
-
+          if (this.previewMode) {
+            this.setTimeOuts(this.selectedElement, previousColor);
+          }
         }
       });
     }
+  }
+
+  private setTimeOuts(element: any, previousColor: string): void {
+    if (this.timeoutsMap.has(element)) {
+      clearTimeout(this.timeoutsMap.get(element));
+    }
+    const timeoutId = setTimeout(() => {
+      element.style('fill', previousColor);
+      this.timeoutsMap.delete(element);
+    }, 5000);
+    this.timeoutsMap.set(element, timeoutId);
   }
 
   public togglePreview(): void {
