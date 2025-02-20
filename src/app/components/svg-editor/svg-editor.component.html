@@ -19,6 +19,11 @@
           <mat-icon>visibility</mat-icon>
           {{ previewMode ? 'Exit Preview' : 'Preview' }}
         </button>
+        <button mat-raised-button color="primary" (click)="downloadSVG()" *ngIf="uploadedSVG">
+          <mat-icon>download</mat-icon>
+          Download SVG
+        </button>
+
       </div>
     </mat-card-header>
 

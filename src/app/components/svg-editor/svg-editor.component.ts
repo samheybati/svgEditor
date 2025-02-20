@@ -8,7 +8,7 @@ import {ColorPickerDialogComponent} from '../color-picker/color-picker.component
 @Component({
   selector: 'app-svg-editor',
   templateUrl: './svg-editor.component.html',
-  styleUrls: ['./svg-editor.component.scss'],
+  styleUrls: ['./svg-editor.component.css'],
   standalone: false
 })
 export class SvgEditorComponent {
@@ -203,5 +203,24 @@ export class SvgEditorComponent {
       labelGroup.attr("data-y", result.position.y);
     });
   }
+
+  public downloadSVG() {
+    const svgElement = this.svgContainer.nativeElement.querySelector('svg');
+    if (!svgElement) return;
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgElement);
+    const blob = new Blob([svgString], {type: 'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'edited.svg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
 
 }
