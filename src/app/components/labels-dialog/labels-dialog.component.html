@@ -34,5 +34,5 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="dialogRef.close()">Cancel</button>
   <button mat-raised-button color="primary" (click)="onSave()">Save</button>
-  <button mat-raised-button color="warn" (click)="onDelete()">Delete</button>
+  <button mat-raised-button *ngIf="data.existingLabel" color="warn" (click)="onDelete()">Delete</button>
 </mat-dialog-actions>
