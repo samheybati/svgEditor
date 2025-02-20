@@ -100,18 +100,14 @@ export class SvgEditorComponent {
       const dialogRef = this.dialog.open(ColorPickerDialogComponent, {
         width: '400px',
         height: '400px',
-        data: {color: previousColor}
+        data: {color: previousColor, previewMode: this.previewMode}
       });
 
       dialogRef.afterClosed().subscribe((newColor) => {
         if (newColor) {
           this.selectedElement.style('fill', newColor);
 
-          if (this.previewMode) {
-            setTimeout(() => {
-              this.selectedElement.style('fill', previousColor);
-            }, 5000);
-          }
+
         }
       });
     }
@@ -126,22 +122,32 @@ export class SvgEditorComponent {
 
     const [x, y] = d3.pointer(event, this.uploadedSVG.node());
 
-    const existingLabel = this.uploadedSVG.selectAll('g.svg-label-group').filter(function (this: any) {
+    let existingLabel = this.uploadedSVG.selectAll('g.svg-label-group').filter(function (this: any) {
       const element = d3.select(this);
       const bbox = element.node().getBBox();
-      return bbox.x <= x && bbox.x + bbox.width >= x && bbox.y <= y && bbox.y + bbox.height >= y;
+      return bbox.x <= x && bbox.x + bbox.width >= x &&
+        bbox.y <= y && bbox.y + bbox.height >= y;
     });
 
     let newPosition = {x, y};
-    if (!existingLabel.empty()) {
-      const bbox = existingLabel.node().getBBox();
-      const ctm = existingLabel.node().getCTM();
 
-      newPosition = {
-        x: bbox.x + (ctm?.e || 0),
-        y: bbox.y + (ctm?.f || 0)
-      };
+    if (!existingLabel.empty()) {
+      const existingLabelNode = existingLabel.node();
+      const bbox = existingLabelNode.getBBox();
+
+      const storedX = existingLabel.attr("data-x");
+      const storedY = existingLabel.attr("data-y");
+
+      if (storedX && storedY) {
+        newPosition = {
+          x: parseFloat(storedX),
+          y: parseFloat(storedY),
+        };
+      } else {
+        newPosition = {x: bbox.x, y: bbox.y};
+      }
     }
+
 
     const dialogRef = this.dialog.open(LabelsDialogComponent, {
       width: '70vw',
@@ -155,41 +161,35 @@ export class SvgEditorComponent {
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
 
+      let labelGroup: any;
       if (!existingLabel.empty()) {
-        const labelGroup = existingLabel;
-        if (result.labelType === 'image') {
-          labelGroup.select('image')
-            .attr('x', newPosition.x)
-            .attr('y', newPosition.y)
-            .attr('width', result.imageSize.width)
-            .attr('height', result.imageSize.height)
-            .attr('href', result.imageUrl);
-        } else {
-          labelGroup.select('text')
-            .attr('x', newPosition.x)
-            .attr('y', newPosition.y)
-            .attr('font-size', result.textSize.fontSize)
-            .attr('fill', result.labelColor)
-            .text(result.labelText);
-        }
+        labelGroup = existingLabel;
       } else {
-        const labelGroup = this.uploadedSVG.append('g').attr('class', 'svg-label-group');
-        if (result.labelType === 'image') {
-          labelGroup.append('image')
-            .attr('x', newPosition.x)
-            .attr('y', newPosition.y)
-            .attr('width', result.imageSize.width)
-            .attr('height', result.imageSize.height)
-            .attr('href', result.imageUrl);
-        } else {
-          labelGroup.append('text')
-            .attr('x', newPosition.x)
-            .attr('y', newPosition.y)
-            .attr('font-size', result.textSize.fontSize)
-            .attr('fill', result.labelColor)
-            .text(result.labelText);
-        }
+        labelGroup = this.uploadedSVG.append('g').attr('class', 'svg-label-group');
       }
+
+      labelGroup.selectAll('*').remove();
+
+      if (result.labelType === 'image') {
+        labelGroup.append('image')
+          .attr('x', result.position.x)
+          .attr('y', result.position.y)
+          .attr('width', result.imageSize.width)
+          .attr('height', result.imageSize.height)
+          .attr('href', result.imageUrl);
+      } else {
+        labelGroup.append('text')
+          .attr('x', result.position.x)
+          .attr('y', result.position.y)
+          .attr('font-size', result.textSize.fontSize)
+          .attr('fill', result.labelColor)
+          .attr('dominant-baseline', 'middle')
+          .attr('text-anchor', 'middle')
+          .text(result.labelText);
+      }
+
+      labelGroup.attr("data-x", result.position.x);
+      labelGroup.attr("data-y", result.position.y);
     });
   }
 
