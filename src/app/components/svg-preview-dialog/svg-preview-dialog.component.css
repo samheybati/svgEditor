@@ -1,0 +1,24 @@
+.preview-container {
+  max-height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.svg-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  svg {
+    max-width: 100%;
+    max-height: 50vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+}

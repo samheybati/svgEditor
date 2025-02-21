@@ -16,9 +16,17 @@ import {LabelsDialogComponent} from './components/labels-dialog/labels-dialog.co
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {BrowserAnimationsModule, provideAnimations} from '@angular/platform-browser/animations';
 import {ColorPickerDialogComponent} from './components/color-picker/color-picker.component';
+import {SvgPreviewDialogComponent} from './components/svg-preview-dialog/svg-preview-dialog.component';
 
 @NgModule({
-  declarations: [AppComponent, SvgEditorComponent, AttributesDialogComponent, LabelsDialogComponent, ColorPickerDialogComponent],
+  declarations: [
+    AppComponent,
+    SvgEditorComponent,
+    AttributesDialogComponent,
+    LabelsDialogComponent,
+    ColorPickerDialogComponent,
+    SvgPreviewDialogComponent
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

@@ -4,6 +4,7 @@ import {AttributesDialogComponent} from '../attributes-dialog/attributes-dialog.
 import {MatDialog} from '@angular/material/dialog';
 import {LabelsDialogComponent} from '../labels-dialog/labels-dialog.component';
 import {ColorPickerDialogComponent} from '../color-picker/color-picker.component';
+import {SvgPreviewDialogComponent} from '../svg-preview-dialog/svg-preview-dialog.component';
 
 @Component({
   selector: 'app-svg-editor',
@@ -26,39 +27,79 @@ export class SvgEditorComponent {
   public uploadSVG(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.svgContainer.nativeElement.innerHTML = e.target?.result as string;
-        this.uploadedSVG = d3.select(this.svgContainer.nativeElement).select('svg');
+      this.readFile(input);
+    }
+  }
 
-        let g = this.uploadedSVG.select('g');
-        if (g.empty()) {
-          g = this.uploadedSVG.append('g');
-          g.html(this.uploadedSVG.html());
-          this.uploadedSVG.html('');
-          this.uploadedSVG.append(() => g.node());
-        }
+  private readFile(input: HTMLInputElement): void {
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const svgContent = e.target?.result as string;
+      this.openPreviewDialog(input, svgContent);
+    };
+    reader.readAsText(file);
+  }
 
 
-        this.uploadedSVG.on('click', (event: MouseEvent) => {
-          event.stopPropagation();
-          const target = d3.select(event.target as SVGElement);
+  private openPreviewDialog(input: HTMLInputElement, svgContent: string): void {
+    const dialogRef = this.dialog.open(SvgPreviewDialogComponent, {
+      width: '600px',
+      data: {svgContent}
+    });
 
-          if (!target.empty() && target.node() !== this.uploadedSVG.node()) {
-            this.selectedElement = target;
-            this.extractAttributes();
-            this.highlightSelectedElement();
-          }
-        });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'reupload') {
+        this.reuploadFile(input);
+      } else if (result === 'continue') {
+        this.processSVG(svgContent);
+      }
+    });
+  }
 
-        const svgElement = this.svgContainer.nativeElement.querySelector('svg');
-        if (svgElement) {
-          svgElement.style.maxHeight = '80vh';
-          svgElement.style.width = 'auto';
-          svgElement.style.objectFit = 'contain';
-        }
-      };
-      reader.readAsText(input.files[0]);
+  private reuploadFile(input: HTMLInputElement): void {
+    input.value = '';
+    setTimeout(() => input.click(), 0);
+  }
+
+  private processSVG(svgContent: string): void {
+    this.svgContainer.nativeElement.innerHTML = svgContent;
+    this.uploadedSVG = d3.select(this.svgContainer.nativeElement).select('svg');
+    this.ensureGroupElement();
+    this.setupClickHandler();
+    this.styleSVG();
+  }
+
+  private ensureGroupElement(): void {
+    let g = this.uploadedSVG.select('g');
+    if (g.empty()) {
+      g = this.uploadedSVG.append('g');
+      g.html(this.uploadedSVG.html());
+      this.uploadedSVG.html('');
+      this.uploadedSVG.append(() => g.node());
+    }
+  }
+
+  private setupClickHandler(): void {
+    this.uploadedSVG.on('click', (event: MouseEvent) => {
+      event.stopPropagation();
+      const target = d3.select(event.target as SVGElement);
+      if (!target.empty() && target.node() !== this.uploadedSVG.node()) {
+        this.selectedElement = target;
+        this.extractAttributes();
+        this.highlightSelectedElement();
+      }
+    });
+  }
+
+  private styleSVG(): void {
+    const svgElement = this.svgContainer.nativeElement.querySelector('svg');
+    if (svgElement) {
+      svgElement.style.maxHeight = '80vh';
+      svgElement.style.width = 'auto';
+      svgElement.style.objectFit = 'contain';
     }
   }
 
