@@ -11,7 +11,7 @@ import * as d3 from 'd3';
 export class LabelsDialogComponent {
   labelType: 'text' | 'image' = 'text';
   labelText: string = '';
-  labelColor: string = '#ff0000';
+  labelColor: string = '#000000';
   imageUrl: string = '';
   imageSize: { width: number; height: number } = {width: 500, height: 500};
   textSize: { fontSize: number } = {fontSize: 100};
