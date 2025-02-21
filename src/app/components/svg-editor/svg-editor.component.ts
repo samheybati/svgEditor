@@ -9,7 +9,7 @@ import {SvgPreviewDialogComponent} from '../svg-preview-dialog/svg-preview-dialo
 @Component({
   selector: 'app-svg-editor',
   templateUrl: './svg-editor.component.html',
-  styleUrls: ['./svg-editor.component.css'],
+  styleUrls: ['./svg-editor.component.scss'],
   standalone: false
 })
 export class SvgEditorComponent {
@@ -47,7 +47,8 @@ export class SvgEditorComponent {
   private openPreviewDialog(input: HTMLInputElement, svgContent: string): void {
     const dialogRef = this.dialog.open(SvgPreviewDialogComponent, {
       width: '600px',
-      data: {svgContent}
+      data: {svgContent},
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
