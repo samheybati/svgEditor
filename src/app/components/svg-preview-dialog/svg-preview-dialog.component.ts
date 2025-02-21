@@ -9,7 +9,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 
 })
 export class SvgPreviewDialogComponent implements AfterViewInit {
-  @ViewChild('svgContainer', {static: true}) svgContainer!: ElementRef;
+  @ViewChild('svgContainer', {static: false}) svgContainer!: ElementRef;
 
   constructor(
     public dialogRef: MatDialogRef<SvgPreviewDialogComponent>,

@@ -14,3 +14,10 @@
   flex-direction: row;
 }
 
+.mat-dialog-container {
+  z-index: 9999 !important; /* Adjust if needed */
+}
+
+.cdk-overlay-backdrop {
+  background-color: rgba(0, 0, 0, 0.5); /* Ensure overlay is visible */
+}
