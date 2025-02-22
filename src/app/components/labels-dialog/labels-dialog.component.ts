@@ -21,32 +21,29 @@ export class LabelsDialogComponent {
     public dialogRef: MatDialogRef<LabelsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    if (data && data.existingLabel) {
+    if (data && data.existingLabel) this.generateInitialData(data)
 
-      const existingLabelNode = data.existingLabel;
-      const labelGroup = d3.select(existingLabelNode);
-
-      this.labelType = labelGroup.select('image').empty() ? 'text' : 'image';
-
-      if (this.labelType === 'text') {
-        this.labelText = labelGroup.select('text').text()
-        this.labelColor = labelGroup.select('text').attr('fill') || '#ff0000';
-      }
-
-      if (this.labelType === 'image') {
-        this.imageUrl = labelGroup.select('image').attr('href') || '';
-        this.imageSize = {
-          width: parseInt(labelGroup.select('image').attr('width'), 10) || 500,
-          height: parseInt(labelGroup.select('image').attr('height'), 10) || 500,
-        };
-      }
-
-      this.position = data.position || {x: 0, y: 0};
-
-    }
   }
 
-  onImageChange(event: any): void {
+  private generateInitialData(data: any) {
+    const existingLabelNode = data.existingLabel;
+    const labelGroup = d3.select(existingLabelNode);
+    this.labelType = labelGroup.select('image').empty() ? 'text' : 'image';
+
+    if (this.labelType === 'text') {
+      this.labelText = labelGroup.select('text').text()
+      this.labelColor = labelGroup.select('text').attr('fill') || '#ff0000';
+    } else if (this.labelType === 'image') {
+      this.imageUrl = labelGroup.select('image').attr('href') || '';
+      this.imageSize = {
+        width: parseInt(labelGroup.select('image').attr('width'), 10) || 500,
+        height: parseInt(labelGroup.select('image').attr('height'), 10) || 500,
+      };
+    }
+    this.position = data.position || {x: 0, y: 0};
+  }
+
+  public onImageChange(event: any): void {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -57,7 +54,7 @@ export class LabelsDialogComponent {
     }
   }
 
-  onSave(): void {
+  public onSave(): void {
     this.dialogRef.close({
       labelType: this.labelType,
       labelText: this.labelText,
@@ -69,12 +66,11 @@ export class LabelsDialogComponent {
     });
   }
 
-  onDelete(): void {
-    if (this.data.existingLabel) {
-      d3.select(this.data.existingLabel).remove();
-    }
+  public onDelete(): void {
+    d3.select(this.data.existingLabel).remove();
     this.dialogRef.close();
   }
+
 }
 
 

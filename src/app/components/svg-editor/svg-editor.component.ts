@@ -201,7 +201,6 @@ export class SvgEditorComponent {
       }
     }
 
-
     const dialogRef = this.dialog.open(LabelsDialogComponent, {
       width: '70vw',
       height: '70vh',
@@ -213,37 +212,40 @@ export class SvgEditorComponent {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
-
       let labelGroup: any;
       if (!existingLabel.empty()) {
         labelGroup = existingLabel;
       } else {
         labelGroup = this.uploadedSVG.append('g').attr('class', 'svg-label-group');
       }
-
-      labelGroup.selectAll('*').remove();
-
-      if (result.labelType === 'image') {
-        labelGroup.append('image')
-          .attr('x', result.position.x)
-          .attr('y', result.position.y)
-          .attr('width', result.imageSize.width)
-          .attr('height', result.imageSize.height)
-          .attr('href', result.imageUrl);
-      } else {
-        labelGroup.append('text')
-          .attr('x', result.position.x)
-          .attr('y', result.position.y)
-          .attr('font-size', result.textSize.fontSize)
-          .attr('fill', result.labelColor)
-          .attr('dominant-baseline', 'middle')
-          .attr('text-anchor', 'middle')
-          .text(result.labelText);
-      }
-
-      labelGroup.attr("data-x", result.position.x);
-      labelGroup.attr("data-y", result.position.y);
+      this.handleLabelDialogRes(result, labelGroup)
     });
+  }
+
+  private handleLabelDialogRes(result: any, labelGroup: any) {
+
+    labelGroup.selectAll('*').remove();
+
+    if (result.labelType === 'image') {
+      labelGroup.append('image')
+        .attr('x', result.position.x)
+        .attr('y', result.position.y)
+        .attr('width', result.imageSize.width)
+        .attr('height', result.imageSize.height)
+        .attr('href', result.imageUrl);
+    } else {
+      labelGroup.append('text')
+        .attr('x', result.position.x)
+        .attr('y', result.position.y)
+        .attr('font-size', result.textSize.fontSize)
+        .attr('fill', result.labelColor)
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .text(result.labelText);
+    }
+
+    labelGroup.attr("data-x", result.position.x);
+    labelGroup.attr("data-y", result.position.y);
   }
 
   public downloadSVG() {
