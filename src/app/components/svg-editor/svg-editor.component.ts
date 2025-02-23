@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import * as d3 from 'd3';
 import {AttributesDialogComponent} from '../attributes-dialog/attributes-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
@@ -12,17 +12,21 @@ import {SvgPreviewDialogComponent} from '../svg-preview-dialog/svg-preview-dialo
   styleUrls: ['./svg-editor.component.scss'],
   standalone: false
 })
-export class SvgEditorComponent {
+export class SvgEditorComponent implements OnDestroy {
   @ViewChild('svgContainer', {static: false}) svgContainer!: ElementRef;
   uploadedSVG: any;
   selectedElement: any = null;
   attributes: { name: string; value: string }[] = [];
   previewMode: boolean = false;
   timeoutsMap: Map<any, any> = new Map()
+  private elColorIntervals = new Map<any, any>();
 
   constructor(public dialog: MatDialog) {
   }
 
+  ngOnDestroy() {
+    this.clearAllIntervals()
+  }
 
   public uploadSVG(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -147,12 +151,36 @@ export class SvgEditorComponent {
       dialogRef.afterClosed().subscribe((newColor) => {
         if (newColor) {
           this.selectedElement.style('fill', newColor);
+          this.changeColorsViaInterval(this.selectedElement, previousColor, newColor);
+
           if (this.previewMode) {
             this.setTimeOuts(this.selectedElement, previousColor);
           }
         }
       });
     }
+  }
+
+  private changeColorsViaInterval(element: any, previousColor: string, newColor: string): void {
+    // console.log( element);
+    let isOriginalColor = false;
+    if (this.elColorIntervals.has(element)) {
+      clearInterval(this.elColorIntervals.get(element));
+      this.elColorIntervals.delete(element);
+    }
+    const intervalId = setInterval(() => {
+      isOriginalColor = !isOriginalColor;
+      element.style('fill', isOriginalColor ? previousColor : newColor);
+    }, 5000);
+
+    this.elColorIntervals.set(element, intervalId);
+    console.log(this.elColorIntervals)
+
+  }
+
+  public clearAllIntervals(): void {
+    this.elColorIntervals.forEach((intervalId) => clearInterval(intervalId));
+    this.elColorIntervals.clear();
   }
 
   private setTimeOuts(element: any, previousColor: string): void {
